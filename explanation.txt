@@ -1,0 +1,218 @@
+SHL Assessment Recommender System - Technical Explanation
+=====================================================
+
+1. RECOMMENDATION SYSTEMS OVERVIEW
+---------------------------------
+A recommendation system is a type of information filtering system that predicts the "rating" or "preference" a user would give to an item. In our case, we're recommending SHL assessments based on job descriptions.
+
+2. KEY COMPONENTS
+----------------
+
+A. Text Processing & Vectorization (TF-IDF)
+------------------------------------------
+TF-IDF (Term Frequency-Inverse Document Frequency) is a numerical statistic that reflects:
+1. TF (Term Frequency): How often a word appears in a document
+2. IDF (Inverse Document Frequency): How rare a word is across all documents
+
+Formula:
+TF-IDF = TF * IDF
+where:
+- TF = (Number of times term t appears in document) / (Total number of terms in document)
+- IDF = log(Total number of documents / Number of documents containing term t)
+
+B. Similarity Measurement (Cosine Similarity)
+-------------------------------------------
+Cosine Similarity measures the cosine of the angle between two vectors:
+cos(θ) = (A·B) / (||A|| ||B||)
+
+Where:
+- A·B is the dot product of vectors A and B
+- ||A|| and ||B|| are the magnitudes of vectors A and B
+
+Range: -1 to 1
+- 1: Vectors are identical
+- 0: Vectors are orthogonal (completely different)
+- -1: Vectors are opposite
+
+C. Evaluation Metrics
+--------------------
+
+1. Recall@K
+----------
+Recall@K = (Number of relevant items in top K) / (Total number of relevant items)
+
+Example:
+- Total relevant items: 5
+- Items in top 3: 2
+- Recall@3 = 2/5 = 0.4 or 40%
+
+2. MAP@K (Mean Average Precision)
+--------------------------------
+MAP@K = (1/|Q|) * Σ(AP@K for each query)
+
+Where:
+- AP@K = (1/min(K,|R|)) * Σ(Precision@k * rel(k))
+- rel(k) = 1 if item at position k is relevant, 0 otherwise
+- |R| = number of relevant items
+- |Q| = number of queries
+
+3. HYBRID RECOMMENDATION APPROACH
+--------------------------------
+
+Our system uses a hybrid approach combining:
+
+A. Content-Based Filtering (TF-IDF)
+----------------------------------
+Content-Based Filtering:
+- Analyzes item features (text content)
+- Creates user profile based on preferences
+- Recommends items similar to what user liked before
+- Advantages:
+  * No cold start problem
+  * Can recommend new items
+  * Can explain recommendations
+
+B. LLM-Based Understanding
+-------------------------
+LLM (Large Language Model) Understanding:
+- Comprehends semantic meaning
+- Understands context and intent
+- Can handle complex queries
+- Advantages:
+  * Better understanding of user intent
+  * Can handle ambiguous queries
+  * Provides human-like reasoning
+
+4. SYSTEM ARCHITECTURE
+---------------------
+
+Theoretical System Flow:
+
+1. Input Processing
+   Job Description → Text Preprocessing → Feature Extraction
+
+2. Recommendation Generation
+   a. TF-IDF Path:
+      - Convert text to vectors
+      - Calculate similarity scores
+      - Rank by similarity
+
+   b. LLM Path:
+      - Analyze job description
+      - Identify relevant assessments
+      - Provide context-aware recommendations
+
+3. Result Combination
+   - Merge both recommendation sets
+   - Apply boosting for LLM matches
+   - Sort by final scores
+
+4. Evaluation
+   - Compare with ground truth
+   - Calculate metrics
+   - Provide feedback
+
+5. KEY CONCEPTS IN PRACTICE
+--------------------------
+
+A. Text Preprocessing
+--------------------
+1. Tokenization: Split text into words
+2. Lowercasing: Convert to lowercase
+3. Stop Word Removal: Remove common words
+4. Stemming/Lemmatization: Reduce words to root form
+5. Vectorization: Convert to numerical form
+
+B. Recommendation Scoring
+------------------------
+Final Score = α * TF-IDF_Score + β * LLM_Score
+
+Where:
+- α and β are weights
+- TF-IDF_Score is cosine similarity
+- LLM_Score is binary (1 if recommended by LLM)
+
+C. Evaluation Framework
+----------------------
+1. Ground Truth:
+   - LLM recommendations as reference
+   - Human-validated assessment matches
+
+2. Metrics:
+   - Recall@K: Coverage of relevant items
+   - MAP@K: Ranking quality of recommendations
+
+3. Validation:
+   - Cross-validation with different queries
+   - A/B testing with different algorithms
+
+6. IMPLEMENTATION DETAILS
+------------------------
+
+A. Data Collection
+-----------------
+- Web scraping of SHL catalog
+- Fallback to sample data if scraping fails
+- Caching for performance optimization
+
+B. Recommendation Generation
+---------------------------
+1. TF-IDF Processing:
+   - Convert job description to vector
+   - Calculate similarity with all assessments
+   - Rank by similarity score
+
+2. LLM Processing:
+   - Send job description to Gemini
+   - Get relevant assessment names
+   - Use as ground truth for evaluation
+
+C. Result Combination
+--------------------
+1. Score Calculation:
+   - Base score from TF-IDF similarity
+   - Boost for LLM-recommended items
+   - Final ranking by combined score
+
+2. Output Format:
+   - Assessment name
+   - URL to assessment
+   - Performance metrics
+
+7. PERFORMANCE CONSIDERATIONS
+----------------------------
+
+A. Caching
+----------
+- Assessment data cached for 1 hour
+- Reduces API calls and processing time
+
+B. Error Handling
+----------------
+- Graceful fallback to sample data
+- Proper error messages
+- Logging for debugging
+
+C. Scalability
+--------------
+- Modular design for easy updates
+- Efficient data structures
+- Optimized algorithms
+
+8. FUTURE IMPROVEMENTS
+---------------------
+
+A. Potential Enhancements
+------------------------
+1. More sophisticated text processing
+2. Additional recommendation algorithms
+3. User feedback integration
+4. Performance optimization
+5. Enhanced error handling
+
+B. Evaluation Improvements
+-------------------------
+1. More comprehensive metrics
+2. User studies
+3. A/B testing framework
+4. Automated testing suite 
